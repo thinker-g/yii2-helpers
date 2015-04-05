@@ -1,0 +1,21 @@
+{
+    "name": "thinker-g/yii2-helpers",
+    "description": "Helper classes for thinker-g's extensions",
+    "type": "library",
+    "keywords": ["yii2","extension"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "thinker-g",
+            "email": "jiyan.guo@gmail.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "thinker_g\\Helpers\\": ""
+        }
+    }
+}
