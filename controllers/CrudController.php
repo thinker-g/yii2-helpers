@@ -19,10 +19,11 @@ abstract class CrudController extends Controller
      *         'model' => FQN_OF_MODEL_CLASS,
      *         'search' => FQN_OF_MODEL_CLASS,
      *         'views' => [
-     *             'i' => 'index',
-     *             'c' => 'create',
-     *             'v' => 'view',
-     *             'u' => 'update'
+     *             ACTION_ID => VIEW_ID,
+     *             'create' => 'create',
+     *             'view' => 'view',
+     *             'update' => 'update',
+     *             'index' => 'index
      *         ]
      *     ],
      *     ...
