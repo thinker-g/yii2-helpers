@@ -7,6 +7,8 @@ use yii\web\Controller;
  *
  * @author Thinker_g
  * @property array $crudConfig Return controller module's "crudConfig" attribute.
+ * @property string $viewID
+ * @property string $modelClass
  */
 abstract class CrudController extends Controller
 {
@@ -51,6 +53,27 @@ abstract class CrudController extends Controller
     public function setCrudConfig($config)
     {
         $this->_crudConfig = $config;
+    }
+
+    /**
+     * Return model class name according to the $key.
+     * @param string $key 'model' for normal model, 'search' for search model class name. 
+     * @return string
+     */
+    public function getModelClass($key)
+    {
+        return $this->getCrudConfig($this->id)[$key];
+    }
+
+    /**
+     * Get view ID by Action ID, action is default to the current action id.
+     * @param string $actionID
+     * @return string
+     */
+    public function getViewID($actionID = null)
+    {
+        empty($actionID) && ($actionID = $this->action->id);
+        return $this->getCrudConfig($this->id)['views'][$actionID];
     }
 }
 
