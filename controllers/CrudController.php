@@ -3,6 +3,7 @@ namespace thinker_g\Helpers\controllers;
 
 use Yii;
 use yii\filters\VerbFilter;
+use yii\data\Pagination;
 
 /**
  * Add CRUD actions based on ModelViewController
@@ -64,7 +65,7 @@ abstract class CrudController extends ModelViewController
         $model = Yii::createObject($this->getModelClass('model'));
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['view', 'id' => $model->primaryKey]);
         } else {
             return $this->render($this->viewID, [
                 'model' => $model,
@@ -83,7 +84,7 @@ abstract class CrudController extends ModelViewController
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['view', 'id' => $model->primaryKey]);
         } else {
             return $this->render($this->viewID, [
                 'model' => $model,
