@@ -1,79 +1,107 @@
 <?php
 namespace thinker_g\Helpers\controllers;
 
-use yii\web\Controller;
+use Yii;
+use yii\filters\VerbFilter;
 
 /**
- *
+ * Add CRUD actions based on ModelViewController
  * @author Thinker_g
- * @property array $crudConfig Return controller module's "crudConfig" attribute.
- * @property string $viewID
- * @property string $modelClass
  */
-abstract class CrudController extends Controller
+abstract class CrudController extends ModelViewController
 {
-    public $moduleAttr = 'crudConfig';
+
     /**
-     * @var array
-     * A template of the array structure:
-     * [
-     *     CONTROLLER_ID => [
-     *         'model' => FQN_OF_MODEL_CLASS,
-     *         'search' => FQN_OF_MODEL_CLASS,
-     *         'views' => [
-     *             ACTION_ID => VIEW_ID,
-     *             'create' => 'create',
-     *             'view' => 'view',
-     *             'update' => 'update',
-     *             'index' => 'index
-     *         ]
-     *     ],
-     *     ...
-     * ]
+     * @inheritdoc
+     * @see \yii\base\Component::behaviors()
      */
-    private $_crudConfig;
-    /**
-     * Getter, if _crudConfig is null, try to get it from module attribute.
-     * @param string $controllerID
-     * @return array
-     */
-    public function getCrudConfig($controllerID = null)
+    public function behaviors()
     {
-        if (is_null($this->_crudConfig)) {
-            $this->_crudConfig = $this->module->{$this->moduleAttr};
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Lists all target models.
+     * @return mixed
+     */
+    public function actionIndex()
+    {
+        $searchModel = Yii::createObject($this->getModelClass('search'));
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render($this->viewID, [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Displays a single target model.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionView($id)
+    {
+        return $this->render($this->viewID, [
+            'model' => $this->findModel($id),
+        ]);
+    }
+
+    /**
+     * Creates a new target model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate()
+    {
+        $model = Yii::createObject($this->getModelClass('model'));
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render($this->viewID, [
+                'model' => $model,
+            ]);
         }
-        return $controllerID && isset($this->_crudConfig[$controllerID]) ?
-            $this->_crudConfig[$controllerID] : $this->_crudConfig;
-    }
-    
-    /**
-     * Setter
-     * @param array $config
-     */
-    public function setCrudConfig($config)
-    {
-        $this->_crudConfig = $config;
     }
 
     /**
-     * Return model class name according to the $key.
-     * @param string $key 'model' for normal model, 'search' for search model class name. 
-     * @return string
+     * Updates an existing target model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
      */
-    public function getModelClass($key)
+    public function actionUpdate($id)
     {
-        return $this->getCrudConfig($this->id)[$key];
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render($this->viewID, [
+                'model' => $model,
+            ]);
+        }
     }
 
     /**
-     * Get view ID by Action ID, action is default to the current action id.
-     * @param string $actionID
-     * @return string
+     * Deletes an existing target model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
      */
-    public function getViewID($actionID = null)
+    public function actionDelete($id)
     {
-        empty($actionID) && ($actionID = $this->action->id);
-        return $this->getCrudConfig($this->id)['views'][$actionID];
+        $this->findModel($id)->delete();
+
+        return $this->redirect(['index']);
     }
 }
 
