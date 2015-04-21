@@ -127,6 +127,7 @@ abstract class CreationMigration extends Migration
      */
     public function init()
     {
+        parent::init();
         if (empty($this->tables)) {
             throw new Exception('Cannot find table definitions in property "tables".', 400);
         }

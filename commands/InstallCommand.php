@@ -1,7 +1,10 @@
 <?php
 namespace thinker_g\Helpers\commands;
 
+use Yii;
 use yii\console\Controller;
+use common\migrations\CreationMigration;
+use yii\helpers\Console;
 
 /**
  * Install console command.
@@ -10,8 +13,21 @@ use yii\console\Controller;
  */
 class InstallCommand extends Controller
 {
-    public $migration;
+    public $migration = null;
     public $actions = [];
+
+    /* (non-PHPdoc)
+     * @see \yii\console\Controller::options()
+     */
+    public function options($actionID)
+    {
+        $options = [
+            'migrate' => [
+                'migration'
+            ]
+        ];
+        return $options[$actionID];
+    }
 
     /**
      * @inheritdoc
@@ -29,6 +45,22 @@ class InstallCommand extends Controller
     public function actionIndex()
     {
         $this->run("/help", [$this->id]);
+        return 0;
+    }
+
+    /**
+     * Run migration with FQN of a migration class.
+     * @param string $operation The method of migration to run.
+     * @return number
+     */
+    public function actionMigrate($operation = 'up')
+    {
+        if ($this->confirm("Migrate {$operation} migration: " . $this->migration)) {
+            $migration = Yii::createObject($this->migration);
+            $migration->{$operation}();
+        } else {
+            $this->stdout('User abort.' . PHP_EOL, Console::FG_YELLOW);
+        }
         return 0;
     }
 
