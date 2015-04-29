@@ -2,96 +2,139 @@
 namespace thinker_g\Helpers\controllers;
 
 use yii\web\Controller;
+use yii\helpers\ArrayHelper;
 
 /**
- * Configurable controller for manipulating a single model with different actions using different views.
  * @author Thinker_g
- * @property array $mvConfig Return controller module's "mvConfig" attribute.
- * @property string $viewID
- * @property string $modelClass
  */
 abstract class ModelViewController extends Controller
 {
-    public $moduleAttr = 'mvConfig';
+    const KEY_DEFAULT = 0;
+    const KEY_MODEL = 'model';
+    const KEY_SEARCH = 'search';
+    const KEY_VIEW = 'view';
+    public $moduleAttr;
     /**
+     * This will be replaced if [[moduleAttr]] is set.
      * @var array
-     * A template of the array structure:
-     * [
-     *     CONTROLLER_ID => [
-     *         'model' => FQN_OF_MODEL_CLASS,
-     *         'search' => FQN_OF_MODEL_CLASS,
-     *         'views' => [
-     *             ACTION_ID => VIEW_ID,
-     *             'create' => 'create',
-     *             'view' => 'view',
-     *             'update' => 'update',
-     *             'index' => 'index
-     *         ]
-     *     ],
-     *     ...
-     * ]
      */
-    private $_mvConfig;
+    public $defaultMap = [
+        [
+            self::KEY_MODEL => 'Model',
+            self::KEY_SEARCH => 'ModelSearch',
+            self::KEY_VIEW => 'index'
+        ],
+        'create' => [self::KEY_VIEW => 'create'],
+        'view' => [self::KEY_VIEW => 'view'],
+        'update' => [self::KEY_VIEW => 'update']
+    ];
+    private $_mvMap;
+    private $_lastActionID;
+    private $_actionMvMap;
     /**
-     * Getter, if _crudConfig is null, try to get it from module attribute.
+     * Return model-view map by controller id.
+     * Leave $controllerID as null to fetch all maps indexed by controller ID.
      * @param string $controllerID
      * @return array
      */
-    public function getMvConfig($controllerID = null)
+    public function getMvMap($renew = false)
     {
-        if (is_null($this->_mvConfig)) {
-            $this->_mvConfig = $this->module->{$this->moduleAttr};
+        if (is_null($this->_mvMap) || $renew) {
+            if (is_null($this->moduleAttr)) {
+                $this->_mvMap = $this->defaultMap;
+            } else {
+                $this->_mvMap = $this->assembleMap($this->module->{$this->moduleAttr}, $this->id);
+            }
         }
-        return $controllerID && isset($this->_mvConfig[$controllerID]) ?
-            $this->_mvConfig[$controllerID] : $this->_mvConfig;
+        return $this->_mvMap;
     }
 
     /**
      * Setter
      * @param array $config
      */
-    public function setMvConfig($config)
+    public function setMvMap($config)
     {
-        $this->_mvConfig = $config;
+        $this->_mvMap = $config;
     }
 
     /**
-     * Return model class name according to the $key.
-     * @param string $key 'model' for normal model, 'search' for search model class name.
-     * @return string
-     */
-    public function getModelClass($key)
-    {
-        return $this->getMvConfig($this->id)[$key];
-    }
-
-    /**
-     * Get view ID by Action ID, action is default to the current action id.
+     *
+     * @param string $key
      * @param string $actionID
-     * @return string
+     * @return string|array|null
      */
-    public function getViewID($actionID = null)
+    public function getModelClass($key = self::KEY_MODEL, $actionID = null)
     {
-        empty($actionID) && ($actionID = $this->action->id);
-        return $this->getMvConfig($this->id)['views'][$actionID];
+        if (is_null($actionID)) {
+            // return current action's model class
+            return $this->getActionMvMap()[$key];
+        } elseif ($actionID === 0) {
+            // return default model class
+            return isset($this->getMvMap()[0][$key]) ? $this->getMvMap()[0][$key] : null;
+        } else {
+            // return other action's model class
+            return $this->getActionMvMap($actionID)[$key];
+        }
+
     }
 
     /**
-     * Finds the target model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return ActiveRecord the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param string $actionID
+     * @return Ambigous <multitype:, array, NULL, mixed, unknown>
      */
-    protected function findModel($id)
+    public function getViewID($actionID = null, $renew = false)
     {
-        if (is_array($modelClass = $this->getModelClass('model'))) {
+        $actionID || $actionID = $this->action->id;
+        return $this->getActionMvMap($actionID, $renew)[self::KEY_VIEW];
+    }
+
+    /**
+     * @param string $id
+     * @throws NotFoundHttpException
+     * @return \yii\db\ActiveRecordInterface
+     */
+    protected function findModel($id, $actionID = null)
+    {
+        if (is_array($modelClass = $this->getModelClass(self::KEY_MODEL, $actionID))) {
             $modelClass = $modelClass['class'];
         }
         if (($model = $modelClass::findOne($id)) !== null) {
             return $model;
         } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException('Model not found.');
+        }
+    }
+
+    /**
+     *
+     * @param string $actionID
+     * @param bool $renew
+     * @return array
+     */
+    public function getActionMvMap($actionID = null, $renew = false)
+    {
+        $actionID || $actionID = $this->action->id;
+        if ($renew || is_null($this->_actionMvMap) || $actionID != $this->_lastActionID) {
+            $this->_lastActionID = $actionID;
+            $this->_actionMvMap = $this->assembleMap($this->getMvMap(), $actionID);
+        }
+        return $this->_actionMvMap;
+    }
+
+    /**
+     *
+     * @param array $map
+     * @param string $targetKey
+     * @return array|null
+     */
+    protected function assembleMap(&$map, $targetKey)
+    {
+        if (isset($map[0])) {
+            return isset($map[$targetKey]) ? ArrayHelper::merge($map[0], $map[$targetKey]) : $map[0];
+        } else {
+            // No default map set
+            return isset($map[$targetKey]) ? $map[$targetKey] : [];
         }
     }
 }
