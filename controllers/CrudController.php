@@ -3,7 +3,6 @@ namespace thinker_g\Helpers\controllers;
 
 use Yii;
 use yii\filters\VerbFilter;
-use yii\data\Pagination;
 
 /**
  * Add CRUD actions based on ModelViewController

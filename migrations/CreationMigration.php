@@ -10,6 +10,7 @@
 namespace thinker_g\Helpers\migrations;
 
 use yii\db\Migration;
+use yii\base\Exception;
 
 /**
  * Abstract class for creating and dropping tables while installing/removing modules.

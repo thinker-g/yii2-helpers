@@ -3,7 +3,6 @@ namespace thinker_g\Helpers\commands;
 
 use Yii;
 use yii\console\Controller;
-use common\migrations\CreationMigration;
 use yii\helpers\Console;
 
 /**

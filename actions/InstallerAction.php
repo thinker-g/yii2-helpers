@@ -9,8 +9,9 @@
 
 namespace thinker_g\Helpers\actions;
 
-use yii\base\Action;
 use Yii;
+use yii\base\Action;
+use yii\helpers\Console;
 
 abstract class InstallerAction extends Action
 {

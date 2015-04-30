@@ -3,6 +3,7 @@ namespace thinker_g\Helpers\controllers;
 
 use yii\web\Controller;
 use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
 
 /**
  * @author Thinker_g
