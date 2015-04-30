@@ -76,9 +76,9 @@ abstract class ModelViewController extends Controller
         if (is_null($actionID)) {
             // return current action's model class
             return $this->getActionMvMap()[$key];
-        } elseif ($actionID === 0) {
+        } elseif ($actionID === self::KEY_DEFAULT) {
             // return default model class
-            return isset($this->getMvMap()[0][$key]) ? $this->getMvMap()[0][$key] : null;
+            return isset($this->getMvMap()[self::KEY_DEFAULT][$key]) ? $this->getMvMap()[self::KEY_DEFAULT][$key] : null;
         } else {
             // return other action's model class
             return $this->getActionMvMap($actionID)[$key];
@@ -110,8 +110,8 @@ abstract class ModelViewController extends Controller
      */
     public function assembleMap(&$map, $targetKey)
     {
-        if (isset($map[0])) {
-            return isset($map[$targetKey]) ? ArrayHelper::merge($map[0], $map[$targetKey]) : $map[0];
+        if (isset($map[self::KEY_DEFAULT])) {
+            return isset($map[$targetKey]) ? ArrayHelper::merge($map[self::KEY_DEFAULT], $map[$targetKey]) : $map[self::KEY_DEFAULT];
         } else {
             // No default map set
             return isset($map[$targetKey]) ? $map[$targetKey] : [];
