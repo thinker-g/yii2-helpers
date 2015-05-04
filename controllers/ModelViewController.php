@@ -4,6 +4,7 @@ namespace thinker_g\Helpers\controllers;
 use yii\web\Controller;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
+use yii\helpers\StringHelper;
 
 /**
  * @author Thinker_g
@@ -41,8 +42,15 @@ abstract class ModelViewController extends Controller
      */
     public function assembleMap(&$map, $targetKey)
     {
-        //TODO fix this.
-        return [];
+        $default = isset($map[self::KEY_DEFAULT]) ? $map[self::KEY_DEFAULT] : [];
+        if ($targetKey == (string)self::KEY_DEFAULT) {
+            // retrieving the default map
+            return $default;
+        } else {
+            // not retrieving the default map
+            $target = isset($map[$targetKey]) ? $map[$targetKey] : [];
+            return ArrayHelper::merge($default, $target);
+        }
     }
 
     /**
@@ -120,8 +128,8 @@ abstract class ModelViewController extends Controller
      */
     public function getViewID($actionID = null, $renew = false, $contextMap = null)
     {
-        $targetViewID = $this->getActionMvMap($actionID, $renew, $contextMap)[self::KEY_VIEW];
-        return empty($targetViewID) ? $this->action->id : $targetViewID;
+        $targetMap = $this->getActionMvMap($actionID, $renew, $contextMap);
+        return isset($targetMap[self::KEY_VIEW]) ? $targetMap[self::KEY_VIEW] : $this->action->id;
     }
 
     /**
