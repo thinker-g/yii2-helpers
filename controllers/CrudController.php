@@ -8,7 +8,7 @@ use yii\filters\VerbFilter;
  * Add CRUD actions based on ModelViewController
  * @author Thinker_g
  */
-abstract class CrudController extends ModelViewController
+class CrudController extends ModelViewController
 {
 
     /**
