@@ -10,6 +10,10 @@ use yii\helpers\ArrayHelper;
 ?>
 <?php $this->beginContent('@app/views/layouts/main.php'); ?>
     <div class="row">
+        <div class="col-sm-10">
+            <?= Alert::widget() ?>
+            <?= $content ?>
+        </div><!-- .col-sm-10 -->
         <div class="col-sm-2">
             <?php if (isset($this->params['sidebarMenu'])): ?>
                 <div class="panel panel-default">
@@ -23,9 +27,5 @@ use yii\helpers\ArrayHelper;
                 </div>
             <?php endif; ?>
         </div><!-- .col-sm-2 -->
-        <div class="col-sm-10">
-            <?= Alert::widget() ?>
-            <?= $content ?>
-        </div><!-- .col-sm-10 -->
     </div><!-- .row -->
 <?php $this->endContent(); ?>
