@@ -59,6 +59,17 @@ abstract class ModelViewController extends Controller
     }
 
     /**
+     * Get class name from a Yii configuration array.
+     * Returns the parameter itself if it's a string, or the element indexed by 'class' if the parameter is an array.
+     * @param string|array $config
+     * @return string The class name fetched from conf array.
+     */
+    public static function classNameFromConf($config)
+    {
+        return is_string($config) ? $config : $config['class'];
+    }
+
+    /**
      * Return model-view map by controller id.
      * Leave $controllerID as null to fetch all maps indexed by the given controller ID.
      * @param bool $renew
@@ -146,9 +157,7 @@ abstract class ModelViewController extends Controller
      */
     protected function findModel($id, $actionID = null, $contextMap = null)
     {
-        if (is_array($modelClass = $this->getModelClass(self::KEY_MODEL, $actionID, $contextMap))) {
-            $modelClass = $modelClass['class'];
-        }
+        $modelClass = static::classNameFromConf($this->getModelClass(self::KEY_MODEL, $actionID, $contextMap));
         if (($model = $modelClass::findOne($id)) !== null) {
             return $model;
         } else {
