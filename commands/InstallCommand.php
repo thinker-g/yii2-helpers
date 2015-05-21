@@ -6,7 +6,8 @@ use yii\console\Controller;
 use yii\helpers\Console;
 
 /**
- * Install console command.
+ * Loader controller for actions of installing/initialization tasks.
+ * You could mount your Actions to this controller instead of creating a new console controller.
  * @author Thinker_g
  *
  */
