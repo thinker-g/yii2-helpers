@@ -20,6 +20,7 @@ abstract class ModelViewController extends Controller
     const KEY_MODEL = 'model';
     const KEY_SEARCH = 'search';
     const KEY_VIEW = 'view';
+    // @todo rename this to a more reasonable name. And also the attr defaultMap.
     public $moduleAttr;
     /**
      * This will be replaced if [[moduleAttr]] is set.
@@ -29,11 +30,7 @@ abstract class ModelViewController extends Controller
         [
             self::KEY_MODEL => 'Model',
             self::KEY_SEARCH => 'ModelSearch',
-            self::KEY_VIEW => 'index'
         ],
-        'create' => [self::KEY_VIEW => 'create'],
-        'view' => [self::KEY_VIEW => 'view'],
-        'update' => [self::KEY_VIEW => 'update']
     ];
     private $_mvMap;
     private $_lastActionID;
