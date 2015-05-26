@@ -20,13 +20,12 @@ abstract class ModelViewController extends Controller
     const KEY_MODEL = 'model';
     const KEY_SEARCH = 'search';
     const KEY_VIEW = 'view';
-    // @todo rename this to a more reasonable name. And also the attr defaultMap.
-    public $moduleAttr;
+    public $moduleMvMapAttr;
     /**
      * This will be replaced if [[moduleAttr]] is set.
      * @var array
      */
-    public $defaultMap = [
+    public $controllerMvMap = [
         [
             self::KEY_MODEL => 'Model',
             self::KEY_SEARCH => 'ModelSearch',
@@ -78,16 +77,16 @@ abstract class ModelViewController extends Controller
         if (is_null($controllerID) || $controllerID == $this->id) {
             // Return current controller's mv map.
             if (is_null($this->_mvMap) || $renew) {
-                if (is_null($this->moduleAttr)) {
-                    $this->_mvMap = $this->defaultMap;
+                if (is_null($this->moduleMvMapAttr)) {
+                    $this->_mvMap = $this->controllerMvMap;
                 } else {
-                    $this->_mvMap = $this->assembleMap($this->module->{$this->moduleAttr}, $this->id);
+                    $this->_mvMap = $this->assembleMap($this->module->{$this->moduleMvMapAttr}, $this->id);
                 }
             }
             return $this->_mvMap;
         } else {
             // Return other controller's mv map.
-            return $this->assembleMap($this->module->{$this->moduleAttr}, $controllerID);
+            return $this->assembleMap($this->module->{$this->moduleMvMapAttr}, $controllerID);
         }
     }
 
