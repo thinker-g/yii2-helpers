@@ -8,7 +8,7 @@ use yii\helpers\StringHelper;
 
 /**
  * @author Thinker_g
- * 
+ *
  * @property array $mvMap
  * @property array $actionMvMap
  * @property string|array $modelClass

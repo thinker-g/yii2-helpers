@@ -3,6 +3,8 @@ namespace thinker_g\Helpers\controllers;
 
 use Yii;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
+use yii\web\BadRequestHttpException;
 
 /**
  * Add CRUD actions based on ModelViewController
@@ -29,7 +31,7 @@ class CrudController extends ModelViewController
 
     /**
      * Lists all target models.
-     * @return mixed
+     * @return string
      */
     public function actionIndex()
     {
@@ -44,27 +46,27 @@ class CrudController extends ModelViewController
 
     /**
      * Displays a single target model.
-     * @param integer $id
-     * @return mixed
+     * @return string
      */
-    public function actionView($id)
+    public function actionView()
     {
+        $pk = static::getRequestedPk($this->getModelClass());
         return $this->render($this->viewID, [
-            'model' => $this->findModel($id),
+            'model' => $this->findModel($pk),
         ]);
     }
 
     /**
      * Creates a new target model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @return \yii\web\Response|string
      */
     public function actionCreate()
     {
-        $model = Yii::createObject($this->getModelClass('model'));
+        $model = Yii::createObject($this->getModelClass());
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->primaryKey]);
+            return $this->redirect(ArrayHelper::merge(['view'], $model->getPrimaryKey(true)));
         } else {
             return $this->render($this->viewID, [
                 'model' => $model,
@@ -75,15 +77,14 @@ class CrudController extends ModelViewController
     /**
      * Updates an existing target model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
+     * @return \yii\web\Response|string
      */
-    public function actionUpdate($id)
+    public function actionUpdate()
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel(static::getRequestedPk($this->getModelClass()));
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->primaryKey]);
+            return $this->redirect(ArrayHelper::merge(['view'], $model->getPrimaryKey(true)));
         } else {
             return $this->render($this->viewID, [
                 'model' => $model,
@@ -94,14 +95,43 @@ class CrudController extends ModelViewController
     /**
      * Deletes an existing target model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id)
+    public function actionDelete()
     {
-        $this->findModel($id)->delete();
-
+        $this->findModel(
+            static::getRequestedPk($this->getModelClass())
+        )->delete();
         return $this->redirect(['index']);
+    }
+
+    /**
+     * Get primary key array from the request according to the model specified in the controller/action.
+     * This method is built for CRUD operations of models who have composed primary keys. It will try to call static
+     * method [[primaryKey()]] of the model, to get an array of attribute names those compose the primary key. Then
+     * retrieve the values, whose name is in the primary key array, from "Query Params"(GET parameters).
+     * If method [[primaryKey()]] doesn't exist, "id" will be used for default primary key.
+     * Any desired primary key missing in the request will cause a BadRequestHttpException.
+     *
+     * @param string $className
+     * @throws BadRequestHttpException
+     */
+    public static function getRequestedPk($className)
+    {
+        $reflector = new \ReflectionClass($className);
+        if ($reflector->hasMethod('primaryKey')) {
+            $keyNames = $className::primaryKey();
+        } else {
+            $keyNames = ['id'];
+        }
+        foreach ($keyNames as $key) {
+            if (is_null($value = Yii::$app->getRequest()->get($key))) {
+                throw new BadRequestHttpException('Missing required parameters: ' . $key);
+            } else {
+                $keys[$key] = $value;
+            }
+        }
+        return $keys;
     }
 }
 

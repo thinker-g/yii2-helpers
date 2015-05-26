@@ -13,8 +13,8 @@ use yii\helpers\ArrayHelper;
         <div class="col-sm-2">
             <?php if (isset($this->params['sidebarMenu'])): ?>
                 <div class="panel panel-default">
-                	<div class="panel-heading">Nav Menu</div>
-                	<?= Nav::widget([
+                        <div class="panel-heading">Nav Menu</div>
+                        <?= Nav::widget([
                         'options' => [
                             'class' => 'nav-pills nav-stacked',
                         ],

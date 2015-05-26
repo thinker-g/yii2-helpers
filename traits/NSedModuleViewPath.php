@@ -19,7 +19,7 @@ trait NSedModuleViewPath
         $this->_nsedModuleViewPath = $path;
         parent::setViewPath($path);
     }
-    
+
     /**
      * If the viewPath is not explicitly set for in this module's configuration,
      * it will return default "[[basePath]]/views/(back|front)".
