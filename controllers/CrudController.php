@@ -115,6 +115,8 @@ class CrudController extends ModelViewController
      *
      * @param string $className
      * @throws BadRequestHttpException
+     * @return array Array contains model primary key, where keys are attribute names values are primary key values.
+     * If provided class doesn't have method [[primaryKey()]], "id" will be used as the primary key attribute name. 
      */
     public static function getRequestedPk($className)
     {
