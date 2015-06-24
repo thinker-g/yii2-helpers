@@ -18,13 +18,19 @@ class ActionBlocker extends RegexActionFilter
     public $exception = 'yii\web\ForbiddenHttpException';
 
     /**
+     * This will be passed as 2nd parameter of [[\Yii::createObject()]].
+     * @var array
+     */
+    public $exceptionParams = [];
+
+    /**
      * @inheritdoc
      * @see \yii\base\ActionFilter::beforeAction()
      */
     public function beforeAction($action)
     {
         if ($this->isActive($action)) {
-            throw Yii::createObject($this->exception);
+            throw Yii::createObject($this->exception, $this->exceptionParams);
         }
     }
 }
