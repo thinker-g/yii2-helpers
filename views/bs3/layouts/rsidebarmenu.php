@@ -6,9 +6,10 @@ use yii\helpers\ArrayHelper;
 
 /** @var $this \yii\web\View */
 /** @var $content string Rendered view content */
-
 ?>
-<?php $this->beginContent('@app/views/layouts/main.php'); ?>
+<?php Yii::$app->layout && $this->beginContent(
+    Yii::$app->getLayoutPath() . DIRECTORY_SEPARATOR . Yii::$app->layout . '.' . Yii::$app->getView()->defaultExtension
+); ?>
     <div class="row">
         <div class="col-sm-10">
             <?= Alert::widget() ?>
@@ -28,4 +29,4 @@ use yii\helpers\ArrayHelper;
             <?php endif; ?>
         </div><!-- .col-sm-2 -->
     </div><!-- .row -->
-<?php $this->endContent(); ?>
+<?php Yii::$app->layout && $this->endContent(); ?>
