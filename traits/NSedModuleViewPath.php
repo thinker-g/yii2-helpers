@@ -4,7 +4,7 @@ namespace thinker_g\Helpers\traits;
 /**
  * When using this trait, a private attribute [[_nsedModuleViewPath]] will be added to the host class.
  * The class's code should never try to access this attribute.
- * @author tlsadmin
+ * @author Thinker_g
  */
 trait NSedModuleViewPath
 {

@@ -4,7 +4,7 @@ namespace thinker_g\Helpers\traits;
 /**
  * This trait is used for providing realtime console log messages.
  * It can be used in any classes extend [[\yii\console\Controller]].
- * @author tlsadmin
+ * @author Thinker_g
  */
 trait RealtimeConsoleLog
 {
