@@ -4,7 +4,6 @@ namespace thinker_g\Helpers\controllers;
 use yii\web\Controller;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
-use yii\helpers\StringHelper;
 
 /**
  * @author Thinker_g

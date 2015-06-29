@@ -113,16 +113,17 @@ class CrudController extends ModelViewController
      * If method [[primaryKey()]] doesn't exist, "id" will be used for default primary key.
      * Any desired primary key missing in the request will cause a BadRequestHttpException.
      *
-     * @param string $className
+     * @param string|array $classConf
      * @throws BadRequestHttpException
      * @return array Array contains model primary key, where keys are attribute names values are primary key values.
      * If provided class doesn't have method [[primaryKey()]], "id" will be used as the primary key attribute name. 
      */
-    public static function getRequestedPk($className)
+    public static function getRequestedPk($classConf)
     {
-        $reflector = new \ReflectionClass($className);
+        $classConf = static::classNameFromConf($classConf);
+        $reflector = new \ReflectionClass($classConf);
         if ($reflector->hasMethod('primaryKey')) {
-            $keyNames = $className::primaryKey();
+            $keyNames = $classConf::primaryKey();
         } else {
             $keyNames = ['id'];
         }
