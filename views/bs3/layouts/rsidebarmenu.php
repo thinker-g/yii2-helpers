@@ -1,8 +1,6 @@
 <?php
-use yii\helpers\Html;
 use yii\bootstrap\Nav;
-use frontend\widgets\Alert;
-use yii\helpers\ArrayHelper;
+use thinker_g\Helpers\widgets\FlashAlert;
 
 /** @var $this \yii\web\View */
 /** @var $content string Rendered view content */
@@ -12,7 +10,7 @@ use yii\helpers\ArrayHelper;
 ); ?>
     <div class="row">
         <div class="col-sm-10">
-            <?= Alert::widget() ?>
+            <?= FlashAlertAlert::widget() ?>
             <?= $content ?>
         </div><!-- .col-sm-10 -->
         <div class="col-sm-2">
