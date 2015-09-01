@@ -1,6 +1,7 @@
 {
     "name": "thinker-g/yii2-helpers",
     "description": "Helper classes for thinker-g's extensions",
+    "version": "1.2.1",
     "type": "library",
     "keywords": ["yii2","extension"],
     "license": "MIT",

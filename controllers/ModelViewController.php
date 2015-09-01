@@ -115,7 +115,7 @@ abstract class ModelViewController extends Controller
             }
             return $this->_actionMvMap;
         } else {
-            return $this->assembleMap($contextMap, $actionID)[$actionID];
+            return $this->assembleMap($contextMap, $actionID);
         }
     }
 
