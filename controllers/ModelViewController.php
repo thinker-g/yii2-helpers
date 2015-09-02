@@ -8,6 +8,28 @@ use yii\web\NotFoundHttpException;
 /**
  * @author Thinker_g
  *
+ * @example
+ *     A typical example CRUD controller level model-view map:
+ *     [
+ *         0 => [
+ *             0 => [
+ *                 'model' => 'fqn\to\model\class',
+ *                 'search' => 'fqn\to\search\model\class',
+ *             ],
+ *         ],
+ *         'model2' => [
+ *             0 => [
+ *                 'model' => 'fqn\to\model2\class',
+ *                 'search' => 'fqn\to\search\model2\class',
+ *             ],
+ *             'index' => [
+ *                 'model' => [fqn\to\model2\specialClass'],
+ *                 'view' => ['special-view-id'],
+ *             ],
+ *             'create' => ['view' => 'special-create-view'],
+ *         ],
+ *     ];
+ *
  * @property array $mvMap
  * @property array $actionMvMap
  * @property string|array $modelClass
@@ -21,15 +43,11 @@ abstract class ModelViewController extends Controller
     const KEY_VIEW = 'view';
     public $moduleMvMapAttr;
     /**
-     * This will be replaced if [[moduleAttr]] is set.
+     * Model-view map of current controller.
+     * This will be overridden by module level model-view map, if [[moduleAttr]] is set.
      * @var array
      */
-    public $controllerMvMap = [
-        [
-            self::KEY_MODEL => 'Model',
-            self::KEY_SEARCH => 'ModelSearch',
-        ],
-    ];
+    public $controllerMvMap = [];
     private $_mvMap;
     private $_lastActionID;
     private $_actionMvMap;
@@ -66,9 +84,10 @@ abstract class ModelViewController extends Controller
 
     /**
      * Return model-view map by controller id.
-     * Leave $controllerID as null to fetch all maps indexed by the given controller ID.
+     * Leave $controllerID as null to fetch maps indexed by the given controller ID.
      * @param bool $renew
-     * @param string $controllerID
+     * @param string $controllerID The controller ID to fetch, leave as null to fetch maps indexed by
+     * current controller ID.
      * @return array
      */
     public function getMvMap($renew = false, $controllerID = null)
@@ -76,10 +95,17 @@ abstract class ModelViewController extends Controller
         if (is_null($controllerID) || $controllerID == $this->id) {
             // Return current controller's mv map.
             if (is_null($this->_mvMap) || $renew) {
-                if (is_null($this->moduleMvMapAttr)) {
-                    $this->_mvMap = $this->controllerMvMap;
-                } else {
-                    $this->_mvMap = $this->assembleMap($this->module->{$this->moduleMvMapAttr}, $this->id);
+                // As assembleMap may cause recursive array merge, use if/else here.
+                $this->_mvMap = $this->controllerMvMap;
+                if (!empty($this->moduleMvMapAttr)) {
+                    $modMvMap = $this->assembleMap($this->module->{$this->moduleMvMapAttr}, $this->id);
+                    // default action mv map "0" has to be handled manually,
+                    // as a numeric index will be accumulated during the merge, instead of being replaced.
+                    if (isset($modMvMap[0])) {
+                        $this->_mvMap[0] = $modMvMap[0];
+                        unset($modMvMap[0]);
+                    }
+                    $this->_mvMap = ArrayHelper::merge($this->_mvMap, $modMvMap);
                 }
             }
             return $this->_mvMap;
@@ -102,7 +128,7 @@ abstract class ModelViewController extends Controller
      *
      * @param string $actionID
      * @param bool $renew
-     * @param array $contextMap Controller level model-view map array.
+     * @param array $contextMap Controller level model-view map array (where keys are the action IDs of the controller).
      * @return array
      */
     public function getActionMvMap($actionID = null, $renew = false, $contextMap = null)
