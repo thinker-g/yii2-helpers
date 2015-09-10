@@ -35,7 +35,7 @@ class CrudController extends ModelViewController
      */
     public function actionIndex()
     {
-        $searchModel = Yii::createObject($this->getModelClass('search'));
+        $searchModel = Yii::createObject($this->getModelClass(static::KEY_SEARCH));
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render($this->viewID, [

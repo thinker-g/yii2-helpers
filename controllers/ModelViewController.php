@@ -170,20 +170,15 @@ abstract class ModelViewController extends Controller
     }
 
     /**
-     * @param string $id
+     * @param string|array $condition Condition used for identifying a model. String will be used as model's PK.
      * @param string $actionID
      * @param array $contextMap
-     * @throws NotFoundHttpException
-     * @return \yii\db\ActiveRecordInterface
+     * @return \yii\db\ActiveRecordInterface The model found, "null" is returned if model not found.
      */
-    protected function findModel($id, $actionID = null, $contextMap = null)
+    protected function findModel($condition = null, $actionID = null, $contextMap = null)
     {
         $modelClass = static::classNameFromConf($this->getModelClass(self::KEY_MODEL, $actionID, $contextMap));
-        if (($model = $modelClass::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('Model not found.');
-        }
+        return $modelClass::findOne($condition);
     }
 
 }
