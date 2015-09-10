@@ -50,9 +50,8 @@ class CrudController extends ModelViewController
      */
     public function actionView()
     {
-        $pk = static::getRequestedPk($this->getModelClass());
         return $this->render($this->viewID, [
-            'model' => $this->findModel($pk),
+            'model' => $this->findModel(),
         ]);
     }
 
@@ -81,7 +80,7 @@ class CrudController extends ModelViewController
      */
     public function actionUpdate()
     {
-        $model = $this->findModel(static::getRequestedPk($this->getModelClass()));
+        $model = $this->findModel();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(ArrayHelper::merge(['view'], $model->getPrimaryKey(true)));
@@ -99,9 +98,7 @@ class CrudController extends ModelViewController
      */
     public function actionDelete()
     {
-        $this->findModel(
-            static::getRequestedPk($this->getModelClass())
-        )->delete();
+        $this->findModel()->delete();
         return $this->redirect(['index']);
     }
 
@@ -136,6 +133,20 @@ class CrudController extends ModelViewController
         }
         return $keys;
     }
+
+    /**
+     * @inheritdoc
+     * @see \thinker_g\Helpers\controllers\ModelViewController::findModel()
+     */
+    protected function findModel($condition = null, $actionID = null, $contextMap = null)
+    {
+        if (is_null($condition)) {
+            $condition = static::getRequestedPk($this->getModelClass());
+        }
+        return parent::findModel($condition, $actionID, $contextMap);
+        
+    }
+
 }
 
 ?>
