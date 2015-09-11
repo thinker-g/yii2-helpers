@@ -65,11 +65,11 @@ class CrudController extends ModelViewController
         $model = Yii::createObject($this->getModelClass());
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            \Yii::$app->getSession()->setFlash('success', \Yii::t('app', 'Entry created.'));
+            \Yii::$app->getSession()->setFlash('success', $this->getFlashMsg('success'));
             return $this->redirect(ArrayHelper::merge(['view'], $model->getPrimaryKey(true)));
         } else {
             if ($model->hasErrors()) {
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('app', 'Operation failed.'));
+                \Yii::$app->getSession()->setFlash('error', $this->getFlashMsg('error'));
             }
             return $this->render($this->viewID, [
                 'model' => $model,
@@ -87,11 +87,11 @@ class CrudController extends ModelViewController
         $model = $this->findModel();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            \Yii::$app->getSession()->setFlash('success', \Yii::t('app', 'Entry saved.'));
+            \Yii::$app->getSession()->setFlash('success', $this->getFlashMsg('success'));
             return $this->redirect(ArrayHelper::merge(['view'], $model->getPrimaryKey(true)));
         } else {
             if ($model->hasErrors()) {
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('app', 'Operation failed.'));
+                \Yii::$app->getSession()->setFlash('error', $this->getFlashMsg('error'));
             }
             return $this->render($this->viewID, [
                 'model' => $model,
@@ -107,9 +107,9 @@ class CrudController extends ModelViewController
     public function actionDelete()
     {
         if ($this->findModel()->delete()) {
-            \Yii::$app->getSession()->setFlash('success', \Yii::t('app', 'Entry deleted.'));;
+            \Yii::$app->getSession()->setFlash('success', $this->getFlashMsg('success'));;
         } else {
-            \Yii::$app->getSession()->setFlash('error', \Yii::t('app', 'No entry deleted.'));
+            \Yii::$app->getSession()->setFlash('error', $this->getFlashMsg('error'));
         }
         return $this->redirect(['index']);
     }
@@ -157,6 +157,37 @@ class CrudController extends ModelViewController
         }
         return parent::findModel($condition, $actionID, $contextMap);
         
+    }
+
+    /**
+     * Get corresponding flash message.
+     * The messages data source is an array returned by methor [[flashMsgs()]].
+     * @param string $key
+     * @param string $actionId
+     * @return string|null
+     */
+    protected function getFlashMsg($key, $actionId = null)
+    {
+        is_null($actionId) && $actionId = $this->action->id;
+        $msgs = static::assembleMap($this->flashMsgs(), $actionId);
+        return isset($msgs[$key]) ? $msgs[$key] : null;
+    }
+
+    /**
+     * Return an array with flash messages, by key and corresponding action id.
+     * @return array 2 dementional array, where 1st keys are action IDs, and 2nd keys are flash message keys.
+     */
+    public function flashMsgs()
+    {
+        return [
+            ['error' => 'Operation failed'],
+            'create' => ['success' => 'Entry saved'],
+            'update' => ['success' => 'Entry saved'],
+            'delete' => [
+                'success' => 'Entry deleted',
+                'error' => 'No entry deleted',
+            ]
+        ];
     }
 
 }

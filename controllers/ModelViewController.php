@@ -58,7 +58,7 @@ abstract class ModelViewController extends Controller
      * @param string $targetKey
      * @return array|null
      */
-    public static function assembleMap(&$map, $targetKey)
+    public static function assembleMap($map, $targetKey)
     {
         $default = isset($map[self::KEY_DEFAULT]) ? $map[self::KEY_DEFAULT] : [];
         if ($targetKey == (string)self::KEY_DEFAULT) {
