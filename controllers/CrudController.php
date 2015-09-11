@@ -65,8 +65,12 @@ class CrudController extends ModelViewController
         $model = Yii::createObject($this->getModelClass());
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            \Yii::$app->getSession()->setFlash('success', \Yii::t('app', 'Entry created.'));
             return $this->redirect(ArrayHelper::merge(['view'], $model->getPrimaryKey(true)));
         } else {
+            if ($model->hasErrors()) {
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app', 'Operation failed.'));
+            }
             return $this->render($this->viewID, [
                 'model' => $model,
             ]);
@@ -83,8 +87,12 @@ class CrudController extends ModelViewController
         $model = $this->findModel();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            \Yii::$app->getSession()->setFlash('success', \Yii::t('app', 'Entry saved.'));
             return $this->redirect(ArrayHelper::merge(['view'], $model->getPrimaryKey(true)));
         } else {
+            if ($model->hasErrors()) {
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app', 'Operation failed.'));
+            }
             return $this->render($this->viewID, [
                 'model' => $model,
             ]);
@@ -98,7 +106,11 @@ class CrudController extends ModelViewController
      */
     public function actionDelete()
     {
-        $this->findModel()->delete();
+        if ($this->findModel()->delete()) {
+            \Yii::$app->getSession()->setFlash('success', \Yii::t('app', 'Entry deleted.'));;
+        } else {
+            \Yii::$app->getSession()->setFlash('error', \Yii::t('app', 'No entry deleted.'));
+        }
         return $this->redirect(['index']);
     }
 
