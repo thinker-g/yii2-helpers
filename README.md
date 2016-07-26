@@ -1,10 +1,11 @@
 Thinker-g Helpers
 =================
+Helper classes for thinker-g's extensions.
+
 [![Latest Stable Version](https://poser.pugx.org/thinker-g/yii2-helpers/v/stable)](https://packagist.org/packages/thinker-g/yii2-ishtar-gate)
 [![Total Downloads](https://poser.pugx.org/thinker-g/yii2-helpers/downloads)](https://packagist.org/packages/thinker-g/yii2-ishtar-gate)
 [![License](https://poser.pugx.org/thinker-g/yii2-helpers/license)](https://packagist.org/packages/thinker-g/yii2-ishtar-gate)
-
-Helper classes for thinker-g's extensions
+[![Powered by Yii 2.0](https://img.shields.io/badge/Powered%20by-Yii%20Framework%202.0-yellowgreen.svg)](http://www.yiiframework.com/)
 
 Installation
 ------------
